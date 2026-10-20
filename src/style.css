@@ -52,3 +52,8 @@ small { color: var(--dim); letter-spacing: .18em; text-transform: uppercase; fon
 .x { color: var(--dim); } .x:hover { color: var(--red); }
 .term { flex: 1; min-height: 0; padding: 4px 6px; }
 .xterm-viewport { background: transparent !important; }
+
+.tag { padding: 1px 6px; border: 1px solid var(--line); border-radius: 3px; color: var(--dim); font-size: 10px; }
+.tag.warn { color: var(--red); border-color: rgba(248,113,113,.4); }
+.panel-head { cursor: grab; }
+.panel.over { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }

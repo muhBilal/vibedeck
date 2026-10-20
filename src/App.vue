@@ -22,6 +22,17 @@ function add(kind) {
   counters[kind] = (counters[kind] || 0) + 1
   panels.value.push({ id: `p${++uid}`, kind, n: counters[kind] })
 }
+let dragId = null
+const overId = ref(null)
+function dragStart(id, e) { dragId = id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', id) }
+function drop(id) {
+  overId.value = null
+  const from = panels.value.findIndex((p) => p.id === dragId)
+  const to = panels.value.findIndex((p) => p.id === id)
+  if (from < 0 || to < 0 || from === to) return
+  const [m] = panels.value.splice(from, 1)
+  panels.value.splice(to, 0, m)
+}
 function close(id) { panels.value = panels.value.filter((p) => p.id !== id) }
 function onExit(panel, code) {
   if (code !== 0) lastFail.value = AGENTS[panel.kind].cmd || 'zsh'
@@ -86,7 +97,9 @@ onBeforeUnmount(() => clearInterval(timer))
       <main class="grid" :style="{ '--cols': cols }">
         <TerminalPanel
           v-for="(p, i) in panels" :key="p.id" :panel="p" :index="i"
-          @close="close" @exit="onExit" />
+          :class="{ over: overId === p.id }"
+          @dragover.prevent="overId = p.id" @dragleave="overId = null" @drop.prevent="drop(p.id)"
+          @dragstart="dragStart" @close="close" @exit="onExit" />
         <div v-if="!total" class="empty">Tidak ada terminal. Tambah lewat tombol di atas.</div>
       </main>
     </div>

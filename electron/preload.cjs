@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron')
 contextBridge.exposeInMainWorld('takara', {
   workspace: () => ipcRenderer.invoke('workspace'),
   gitBranch: () => ipcRenderer.invoke('git:status'),
+  version: (cmd) => ipcRenderer.invoke('version', cmd),
   spawn: (opts) => ipcRenderer.invoke('pty:spawn', opts),
   write: (id, d) => ipcRenderer.send('pty:write', id, d),
   resize: (id, c, r) => ipcRenderer.send('pty:resize', id, c, r),

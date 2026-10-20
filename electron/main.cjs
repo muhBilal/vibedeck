@@ -41,6 +41,10 @@ ipcMain.on('pty:resize', (_e, id, cols, rows) => {
 })
 ipcMain.on('pty:kill', (_e, id) => { ptys.get(id)?.kill(); ptys.delete(id) })
 
+ipcMain.handle('version', (_e, cmd) => new Promise((res) =>
+  execFile(process.env.SHELL || '/bin/zsh', ['-lic', `${cmd} --version`], (err, out) =>
+    res(err ? null : (out.match(/\d+\.\d+\.\d+/) || [null])[0]))))
+
 ipcMain.handle('git:status', () => new Promise((res) =>
   execFile('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: WORKSPACE }, (err, out) =>
     res(err ? null : out.trim()))))
