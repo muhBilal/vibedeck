@@ -1,3 +1,4 @@
+import './bridge.js'
 import { createApp } from 'vue'
 import '@xterm/xterm/css/xterm.css'
 import './style.css'

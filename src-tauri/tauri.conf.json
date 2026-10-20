@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Takara Space",
+  "version": "0.1.0",
+  "identifier": "space.takara.app",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      { "title": "Takara Space", "width": 1600, "height": 960, "minWidth": 900, "minHeight": 600,
+        "backgroundColor": "#070b14", "dragDropEnabled": false }
+    ],
+    "security": { "csp": null }
+  },
+  "bundle": { "active": true, "targets": "app", "icon": ["icons/icon.png"] }
+}
