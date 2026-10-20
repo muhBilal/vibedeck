@@ -2,6 +2,7 @@
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import TerminalPanel from './components/TerminalPanel.vue'
 import { AGENTS } from './agents.js'
+import { ICONS } from './icons.js'
 
 const workspace = ref('~/Code/takara-space')
 const branch = ref(null)
@@ -10,6 +11,20 @@ const clock = ref('')
 const sessions = ref([{ id: 1, name: 'Session 1', panels: [], counters: {} }])
 const activeId = ref(1)
 const view = ref('terminal')
+const expanded = ref(false)
+const MENU = [
+  { id: 'terminal', icon: 'terminal', label: 'Terminal', view: 'terminal' },
+  { id: 'agents', icon: 'bot', label: 'Agents', view: 'agents' },
+  { id: 'memory', icon: 'brain', label: 'Memory' },
+  { id: 'logs', icon: 'doc', label: 'Logs' },
+  { id: 'search', icon: 'search', label: 'Search' },
+  { id: 'code', icon: 'code', label: 'Code' },
+  { id: 'cloud', icon: 'cloud', label: 'Cloud' },
+]
+const FOOT = [
+  { id: 'profile', icon: 'user', label: 'Profile' },
+  { id: 'settings', icon: 'gear', label: 'Settings' },
+]
 let uid = 0
 let sid = 1
 const active = computed(() => sessions.value.find((x) => x.id === activeId.value))
@@ -70,18 +85,18 @@ onBeforeUnmount(() => clearInterval(timer))
 
 <template>
   <div class="shell">
-    <nav class="sidebar">
-      <button class="ico" :class="{ active: view === 'terminal' }" title="Terminal" @click="view = 'terminal'">▣</button>
-      <button class="ico" :class="{ active: view === 'agents' }" title="Agents" @click="view = 'agents'">☻</button>
-      <button class="ico" title="Belum aktif">✺</button>
-      <button class="ico" title="Belum aktif">▤</button>
-      <button class="ico" title="Belum aktif">⌕</button>
-      <button class="ico" title="Belum aktif">{ }</button>
-      <button class="ico" title="Belum aktif">☁</button>
+    <nav class="sidebar" :class="{ wide: expanded }">
+      <button v-for="m in MENU" :key="m.id" class="ico" :class="{ active: m.view && view === m.view }"
+        :title="m.view ? m.label : `${m.label} (belum aktif)`" @click="m.view && (view = m.view)">
+        <svg viewBox="0 0 24 24" v-html="ICONS[m.icon]"></svg><span class="lbl">{{ m.label }}</span>
+      </button>
       <span class="spacer"></span>
-      <button class="ico" title="Belum aktif">◉</button>
-      <button class="ico" title="Belum aktif">⚙</button>
-      <button class="ico" title="Belum aktif">»</button>
+      <button v-for="m in FOOT" :key="m.id" class="ico" :title="`${m.label} (belum aktif)`">
+        <svg viewBox="0 0 24 24" v-html="ICONS[m.icon]"></svg><span class="lbl">{{ m.label }}</span>
+      </button>
+      <button class="ico" :title="expanded ? 'Ciutkan' : 'Perluas'" @click="expanded = !expanded">
+        <svg viewBox="0 0 24 24" v-html="ICONS[expanded ? 'collapse' : 'expand']"></svg><span class="lbl">Ciutkan</span>
+      </button>
     </nav>
 
     <div class="main">

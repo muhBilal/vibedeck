@@ -10,9 +10,9 @@ small { color: var(--dim); letter-spacing: .18em; text-transform: uppercase; fon
 .spacer { flex: 1; }
 
 .shell { display: flex; height: 100%; }
-.sidebar { width: 52px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+.sidebar { width: 52px; transition: width .15s; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 10px 0; border-right: 1px solid var(--line); }
-.ico { width: 34px; height: 34px; border-radius: 8px; color: var(--dim); font-size: 15px; }
+.ico { width: 34px; height: 34px; border-radius: 8px; color: var(--dim); display: flex; align-items: center; gap: 12px; padding: 0 7px; white-space: nowrap; }
 .ico:hover { color: var(--txt); }
 .ico.active { color: var(--cyan); background: rgba(34,211,238,.1); box-shadow: inset 0 0 0 1px rgba(34,211,238,.4); }
 
@@ -68,3 +68,9 @@ small { color: var(--dim); letter-spacing: .18em; text-transform: uppercase; fon
   border-radius: 4px; margin-bottom: 4px; text-align: left; }
 .arow:hover { border-color: var(--cyan); }
 .aname { color: var(--cyan); letter-spacing: .15em; min-width: 120px; }
+
+.ico svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.lbl { display: none; letter-spacing: .15em; text-transform: uppercase; font-size: 10px; }
+.sidebar.wide { width: 168px; align-items: stretch; padding: 10px 8px; }
+.sidebar.wide .ico { width: auto; }
+.sidebar.wide .lbl { display: inline; }

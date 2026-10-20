@@ -1,7 +1,12 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 
-window.takara = {
+const demo = !window.__TAURI_INTERNALS__
+
+window.takara = demo ? {
+  workspace: async () => '~/Code/takara-space', gitBranch: async () => 'master', version: async () => '1.0.0',
+  spawn: async () => 0, write() {}, resize() {}, kill() {}, onData() {}, onExit() {},
+} : {
   workspace: () => invoke('get_workspace'),
   gitBranch: () => invoke('git_branch'),
   version: (cmd) => invoke('version', { cmd }),
