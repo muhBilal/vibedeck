@@ -53,7 +53,7 @@ onMounted(async () => {
   })
   term.onResize(({ cols, rows }) => window.takara.resize(props.panel.id, cols, rows))
 
-  ro = new ResizeObserver(() => fit.fit())
+  ro = new ResizeObserver(() => { if (el.value.offsetWidth > 0) fit.fit() })
   ro.observe(el.value)
 })
 

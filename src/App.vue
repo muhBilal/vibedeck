@@ -7,33 +7,48 @@ const workspace = ref('~/Code/takara-space')
 const branch = ref(null)
 const lastFail = ref('-')
 const clock = ref('')
-const panels = ref([])
-const counters = {}
+const sessions = ref([{ id: 1, name: 'Session 1', panels: [], counters: {} }])
+const activeId = ref(1)
 let uid = 0
+let sid = 1
+const active = computed(() => sessions.value.find((x) => x.id === activeId.value))
+const allPanels = computed(() => sessions.value.flatMap((x) => x.panels))
 let timer
 
-const total = computed(() => panels.value.length)
+const total = computed(() => allPanels.value.length)
 const aiUsed = computed(() =>
-  [...new Set(panels.value.map((p) => p.kind).filter((k) => k !== 'terminal'))]
+  [...new Set(allPanels.value.map((p) => p.kind).filter((k) => k !== 'terminal'))]
     .map((k) => AGENTS[k].label[0] + AGENTS[k].label.slice(1).toLowerCase()).join(', ') || '-')
-const cols = computed(() => Math.max(1, Math.ceil(Math.sqrt(total.value))))
 
 function add(kind) {
-  counters[kind] = (counters[kind] || 0) + 1
-  panels.value.push({ id: `p${++uid}`, kind, n: counters[kind] })
+  const c = active.value.counters
+  c[kind] = (c[kind] || 0) + 1
+  active.value.panels.push({ id: `p${++uid}`, kind, n: c[kind] })
+}
+function addSession() {
+  sessions.value.push({ id: ++sid, name: `Session ${sid}`, panels: [], counters: {} })
+  activeId.value = sid
+  add('terminal')
+}
+function closeSession(id) {
+  if (sessions.value.length === 1) return
+  const i = sessions.value.findIndex((x) => x.id === id)
+  sessions.value.splice(i, 1)
+  if (activeId.value === id) activeId.value = sessions.value[Math.max(0, i - 1)].id
 }
 let dragId = null
 const overId = ref(null)
 function dragStart(id, e) { dragId = id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', id) }
 function drop(id) {
   overId.value = null
-  const from = panels.value.findIndex((p) => p.id === dragId)
-  const to = panels.value.findIndex((p) => p.id === id)
+  const list = active.value.panels
+  const from = list.findIndex((p) => p.id === dragId)
+  const to = list.findIndex((p) => p.id === id)
   if (from < 0 || to < 0 || from === to) return
-  const [m] = panels.value.splice(from, 1)
-  panels.value.splice(to, 0, m)
+  const [m] = list.splice(from, 1)
+  list.splice(to, 0, m)
 }
-function close(id) { panels.value = panels.value.filter((p) => p.id !== id) }
+function close(id) { active.value.panels = active.value.panels.filter((p) => p.id !== id) }
 function onExit(panel, code) {
   if (code !== 0) lastFail.value = AGENTS[panel.kind].cmd || 'zsh'
 }
@@ -55,16 +70,16 @@ onBeforeUnmount(() => clearInterval(timer))
   <div class="shell">
     <nav class="sidebar">
       <button class="ico active">▣</button>
-      <button class="ico">☻</button>
-      <button class="ico">✺</button>
-      <button class="ico">▤</button>
-      <button class="ico">⌕</button>
-      <button class="ico">{ }</button>
-      <button class="ico">☁</button>
+      <button class="ico" title="Belum aktif">☻</button>
+      <button class="ico" title="Belum aktif">✺</button>
+      <button class="ico" title="Belum aktif">▤</button>
+      <button class="ico" title="Belum aktif">⌕</button>
+      <button class="ico" title="Belum aktif">{ }</button>
+      <button class="ico" title="Belum aktif">☁</button>
       <span class="spacer"></span>
-      <button class="ico">◉</button>
-      <button class="ico">⚙</button>
-      <button class="ico">»</button>
+      <button class="ico" title="Belum aktif">◉</button>
+      <button class="ico" title="Belum aktif">⚙</button>
+      <button class="ico" title="Belum aktif">»</button>
     </nav>
 
     <div class="main">
@@ -77,8 +92,12 @@ onBeforeUnmount(() => clearInterval(timer))
       </header>
 
       <div class="sessions">
-        <div class="tab">1 Session 1 <b>{{ total }}/{{ total }}</b></div>
-        <button class="plus">+ ▾</button>
+        <div v-for="(x, i) in sessions" :key="x.id" class="tab" :class="{ on: x.id === activeId }"
+          @click="activeId = x.id">
+          {{ i + 1 }} {{ x.name }} <b>{{ x.panels.length }}/{{ x.panels.length }}</b>
+          <button v-if="sessions.length > 1" class="tx" @click.stop="closeSession(x.id)">✕</button>
+        </div>
+        <button class="plus" title="Sesi baru" @click="addSession">+ ▾</button>
       </div>
 
       <div class="chips">
@@ -94,13 +113,14 @@ onBeforeUnmount(() => clearInterval(timer))
         <button class="quick" @click="add('gemini')">Gemini</button>
       </div>
 
-      <main class="grid" :style="{ '--cols': cols }">
+      <main v-for="x in sessions" v-show="x.id === activeId" :key="x.id" class="grid"
+        :style="{ '--cols': Math.max(1, Math.ceil(Math.sqrt(x.panels.length))) }">
         <TerminalPanel
-          v-for="(p, i) in panels" :key="p.id" :panel="p" :index="i"
+          v-for="(p, i) in x.panels" :key="p.id" :panel="p" :index="i"
           :class="{ over: overId === p.id }"
           @dragover.prevent="overId = p.id" @dragleave="overId = null" @drop.prevent="drop(p.id)"
           @dragstart="dragStart" @close="close" @exit="onExit" />
-        <div v-if="!total" class="empty">Tidak ada terminal. Tambah lewat tombol di atas.</div>
+        <div v-if="!x.panels.length" class="empty">Tidak ada terminal. Tambah lewat tombol di atas.</div>
       </main>
     </div>
   </div>

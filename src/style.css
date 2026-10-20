@@ -57,3 +57,7 @@ small { color: var(--dim); letter-spacing: .18em; text-transform: uppercase; fon
 .tag.warn { color: var(--red); border-color: rgba(248,113,113,.4); }
 .panel-head { cursor: grab; }
 .panel.over { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+
+.tab { cursor: pointer; border-color: var(--line); color: var(--dim); }
+.tab.on { border-color: var(--cyan); color: var(--cyan); }
+.tx { color: var(--dim); margin-left: 6px; font-size: 10px; } .tx:hover { color: var(--red); }
