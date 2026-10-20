@@ -61,3 +61,10 @@ small { color: var(--dim); letter-spacing: .18em; text-transform: uppercase; fon
 .tab { cursor: pointer; border-color: var(--line); color: var(--dim); }
 .tab.on { border-color: var(--cyan); color: var(--cyan); }
 .tx { color: var(--dim); margin-left: 6px; font-size: 10px; } .tx:hover { color: var(--red); }
+
+.agents { flex: 1; overflow: auto; padding: 8px 16px; }
+.agents h4 { color: var(--cyan); letter-spacing: .2em; text-transform: uppercase; font-size: 10px; margin: 14px 0 6px; }
+.arow { display: flex; align-items: center; gap: 12px; width: 100%; padding: 6px 10px; border: 1px solid var(--line);
+  border-radius: 4px; margin-bottom: 4px; text-align: left; }
+.arow:hover { border-color: var(--cyan); }
+.aname { color: var(--cyan); letter-spacing: .15em; min-width: 120px; }

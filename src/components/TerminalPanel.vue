@@ -7,7 +7,6 @@ import { AGENTS } from '../agents.js'
 const props = defineProps({ panel: Object, index: Number })
 const emit = defineEmits(['close', 'exit', 'dragstart'])
 const el = ref(null)
-const alive = ref(true)
 const tags = ref([])
 const version = ref('')
 let term, fit, ro, offData
@@ -60,7 +59,7 @@ onMounted(async () => {
 function onData(id, d) { if (id === props.panel.id) { term?.write(d); scan(d) } }
 function onExit(id, code) {
   if (id !== props.panel.id) return
-  alive.value = false
+  props.panel.alive = false
   emit('exit', props.panel, code)
 }
 window.takara.onData(onData)
@@ -81,7 +80,7 @@ onBeforeUnmount(() => {
       <span class="proc">{{ agent.cmd || 'zsh' }} {{ version }}</span>
       <span v-for="t in tags" :key="t.text" class="tag" :class="{ warn: t.warn }">{{ t.text }}</span>
       <span class="spacer"></span>
-      <span class="dot" :class="{ off: !alive }"></span>
+      <span class="dot" :class="{ off: panel.alive === false }"></span>
       <button class="x" title="Tutup" @click="emit('close', panel.id)">✕</button>
     </header>
     <div ref="el" class="term"></div>

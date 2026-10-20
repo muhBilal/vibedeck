@@ -9,6 +9,7 @@ const lastFail = ref('-')
 const clock = ref('')
 const sessions = ref([{ id: 1, name: 'Session 1', panels: [], counters: {} }])
 const activeId = ref(1)
+const view = ref('terminal')
 let uid = 0
 let sid = 1
 const active = computed(() => sessions.value.find((x) => x.id === activeId.value))
@@ -48,6 +49,7 @@ function drop(id) {
   const [m] = list.splice(from, 1)
   list.splice(to, 0, m)
 }
+function jump(sessionId) { activeId.value = sessionId; view.value = 'terminal' }
 function close(id) { active.value.panels = active.value.panels.filter((p) => p.id !== id) }
 function onExit(panel, code) {
   if (code !== 0) lastFail.value = AGENTS[panel.kind].cmd || 'zsh'
@@ -69,8 +71,8 @@ onBeforeUnmount(() => clearInterval(timer))
 <template>
   <div class="shell">
     <nav class="sidebar">
-      <button class="ico active">▣</button>
-      <button class="ico" title="Belum aktif">☻</button>
+      <button class="ico" :class="{ active: view === 'terminal' }" title="Terminal" @click="view = 'terminal'">▣</button>
+      <button class="ico" :class="{ active: view === 'agents' }" title="Agents" @click="view = 'agents'">☻</button>
       <button class="ico" title="Belum aktif">✺</button>
       <button class="ico" title="Belum aktif">▤</button>
       <button class="ico" title="Belum aktif">⌕</button>
@@ -113,7 +115,19 @@ onBeforeUnmount(() => clearInterval(timer))
         <button class="quick" @click="add('gemini')">Gemini</button>
       </div>
 
-      <main v-for="x in sessions" v-show="x.id === activeId" :key="x.id" class="grid"
+      <section v-if="view === 'agents'" class="agents">
+        <div v-for="x in sessions" :key="x.id">
+          <h4>{{ x.name }}</h4>
+          <button v-for="(p, i) in x.panels" :key="p.id" class="arow" @click="jump(x.id)">
+            <span class="dot" :class="{ off: p.alive === false }"></span>
+            <span class="aname">{{ AGENTS[p.kind].label }} {{ p.n }}</span>
+            <span class="proc">{{ AGENTS[p.kind].cmd || 'zsh' }} · #{{ i + 1 }}</span>
+            <span class="proc">{{ p.alive === false ? 'EXITED' : 'RUNNING' }}</span>
+          </button>
+        </div>
+      </section>
+
+      <main v-for="x in sessions" v-show="view === 'terminal' && x.id === activeId" :key="x.id" class="grid"
         :style="{ '--cols': Math.max(1, Math.ceil(Math.sqrt(x.panels.length))) }">
         <TerminalPanel
           v-for="(p, i) in x.panels" :key="p.id" :panel="p" :index="i"
