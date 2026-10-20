@@ -196,6 +196,9 @@ function dragStart(id, e) {
 function dragEnd() {
   dragId = null
   overId.value = null
+  nextTick(() => {
+    window.dispatchEvent(new Event('resize'))
+  })
 }
 
 function onPanelDragOver(id, e) {
@@ -216,7 +219,9 @@ function onPanelDrop(id) {
   if (from < 0) return
   const [m] = list.splice(from, 1)
   let to = list.findIndex((p) => p.id === id)
-  if (dropPos.value === 'after') {
+  if (to < 0) {
+    list.push(m)
+  } else if (dropPos.value === 'after') {
     list.splice(to + 1, 0, m)
   } else {
     list.splice(to, 0, m)
@@ -224,6 +229,9 @@ function onPanelDrop(id) {
   overId.value = null
   dragId = null
   logActivity(`Reordered terminal window`, 'info')
+  nextTick(() => {
+    window.dispatchEvent(new Event('resize'))
+  })
 }
 
 function handlePanelResize({ id, width, height }) {
@@ -841,7 +849,9 @@ onBeforeUnmount(() => {
           `layout-${layoutMode}`,
           {
             'has-maximized': maximizedPanelId,
-            'is-single': x.panels.length === 1
+            'is-single': x.panels.length === 1,
+            'is-double': x.panels.length === 2,
+            'is-dragging': Boolean(dragId),
           }
         ]"
       >

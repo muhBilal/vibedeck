@@ -291,14 +291,20 @@ onMounted(async () => {
 
   term.onResize(({ cols, rows }) => bridge.resize(props.panel.id, cols, rows))
 
-  ro = new ResizeObserver(() => {
+  function refit() {
     if (el.value && el.value.offsetWidth > 0 && el.value.offsetHeight > 0) {
       try {
         fit?.fit()
+        term?.refresh(0, (term.rows || 1) - 1)
       } catch (_) {}
     }
+  }
+
+  ro = new ResizeObserver(() => {
+    refit()
   })
   ro.observe(el.value)
+  window.addEventListener('resize', refit)
 
   unData = await bridge.onData((id, d) => {
     if (id === props.panel.id) {
@@ -331,6 +337,7 @@ watch(() => props.theme, (newTheme) => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', refit)
   ro?.disconnect()
   unData?.()
   unExit?.()

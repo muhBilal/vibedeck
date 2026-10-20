@@ -864,7 +864,7 @@ kbd {
   display: grid;
   gap: 12px;
   padding: 10px 16px 16px;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
   grid-auto-rows: minmax(280px, 1fr);
   align-content: stretch;
   overscroll-behavior: contain;
@@ -876,6 +876,16 @@ kbd {
   grid-template-rows: 1fr;
 }
 
+/* Exactly 2 terminals: split 50/50 without any empty space */
+.terminal-grid.is-double {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr;
+}
+.terminal-grid.is-double.layout-stack {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, 1fr);
+}
+
 .terminal-grid.layout-columns {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
   grid-auto-rows: 1fr;
@@ -884,6 +894,10 @@ kbd {
 .terminal-grid.layout-stack {
   grid-template-columns: 1fr;
   grid-auto-rows: minmax(280px, 1fr);
+}
+
+.terminal-grid.is-dragging .term-container {
+  pointer-events: none;
 }
 
 .terminal-grid.has-maximized {

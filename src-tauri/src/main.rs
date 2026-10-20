@@ -61,6 +61,16 @@ fn fix_macos_path() {
 #[cfg(not(target_os = "macos"))]
 fn fix_macos_path() {}
 
+#[cfg(target_os = "linux")]
+fn fix_linux_gio() {
+    if std::env::var_os("GIO_MODULE_DIR").is_none() {
+        std::env::set_var("GIO_MODULE_DIR", "");
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+fn fix_linux_gio() {}
+
 fn shell() -> String {
     if cfg!(target_os = "windows") {
         std::env::var("COMSPEC").unwrap_or_else(|_| "powershell.exe".into())
@@ -338,6 +348,7 @@ fn pty_kill(state: State<Ptys>, id: String) {
 
 fn main() {
     fix_macos_path();
+    fix_linux_gio();
     tauri::Builder::default()
         .manage(Ptys::default())
         .invoke_handler(tauri::generate_handler![
