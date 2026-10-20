@@ -71,6 +71,33 @@ fn fix_linux_gio() {
 #[cfg(not(target_os = "linux"))]
 fn fix_linux_gio() {}
 
+#[cfg(target_os = "linux")]
+const HOST_ENV_LEAKS: &[&str] = &[
+    "LD_LIBRARY_PATH",
+    "GIO_MODULE_DIR",
+    "GTK_PATH",
+    "GTK_EXE_PREFIX",
+    "GTK_DATA_PREFIX",
+    "GTK_IM_MODULE_FILE",
+    "GDK_PIXBUF_MODULE_FILE",
+    "GSETTINGS_SCHEMA_DIR",
+    "GI_TYPELIB_PATH",
+];
+
+#[cfg(target_os = "linux")]
+fn clean_host_env(b: &mut CommandBuilder) {
+    for var in HOST_ENV_LEAKS {
+        b.env_remove(var);
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn clean_cmd_env(c: &mut Command) {
+    for var in HOST_ENV_LEAKS {
+        c.env_remove(var);
+    }
+}
+
 fn shell() -> String {
     if cfg!(target_os = "windows") {
         std::env::var("COMSPEC").unwrap_or_else(|_| "powershell.exe".into())
@@ -202,8 +229,10 @@ fn reveal_in_finder(path: String) -> Result<(), String> {
     {
         let p = Path::new(&target);
         let dir = if p.is_dir() { p } else { p.parent().unwrap_or(p) };
-        Command::new("xdg-open")
-            .arg(dir)
+        let mut c = Command::new("xdg-open");
+        #[cfg(target_os = "linux")]
+        clean_cmd_env(&mut c);
+        c.arg(dir)
             .spawn()
             .map_err(|e| e.to_string())?;
     }
@@ -213,7 +242,10 @@ fn reveal_in_finder(path: String) -> Result<(), String> {
 #[tauri::command]
 fn git_branch(path: Option<String>) -> Option<String> {
     let target = expand_path(path.as_deref().unwrap_or("~"));
-    let out = Command::new("git")
+    let mut c = Command::new("git");
+    #[cfg(target_os = "linux")]
+    clean_cmd_env(&mut c);
+    let out = c
         .args(["rev-parse", "--abbrev-ref", "HEAD"])
         .current_dir(&target)
         .output()
@@ -231,10 +263,14 @@ fn version(cmd: String) -> Option<String> {
         .output()
         .ok()?;
     #[cfg(not(target_os = "windows"))]
-    let out = Command::new(shell())
-        .args(["-lic", &format!("{cmd} --version")])
-        .output()
-        .ok()?;
+    let out = {
+        let mut c = Command::new(shell());
+        #[cfg(target_os = "linux")]
+        clean_cmd_env(&mut c);
+        c.args(["-lic", &format!("{cmd} --version")])
+            .output()
+            .ok()?
+    };
     let text = String::from_utf8_lossy(&out.stdout);
     text.split_whitespace()
         .find(|w| {
@@ -259,6 +295,8 @@ fn pty_spawn(
         .map_err(|e| e.to_string())?;
     let sh = shell();
     let mut b = CommandBuilder::new(&sh);
+    #[cfg(target_os = "linux")]
+    clean_host_env(&mut b);
     #[cfg(target_os = "windows")]
     {
         if !cmd.is_empty() {
