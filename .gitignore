@@ -1,3 +1,9 @@
 node_modules
 dist
+dist-isolation
 src-tauri/target
+target
+.DS_Store
+*.log
+.env
+.env.local

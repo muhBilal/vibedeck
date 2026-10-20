@@ -1,5 +1,5 @@
 [package]
-name = "takara-space"
+name = "vibedeck"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,13 +7,13 @@ edition = "2021"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["devtools"] }
 portable-pty = "0.9"
 serde = { version = "1", features = ["derive"] }
 
 [profile.release]
-opt-level = "s"
-lto = true
-codegen-units = 1
+opt-level = 2
+lto = "thin"
+codegen-units = 4
 strip = true
 panic = "abort"

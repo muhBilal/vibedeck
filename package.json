@@ -1,7 +1,7 @@
 {
-  "name": "takara-space",
+  "name": "vibedeck",
   "version": "0.1.0",
-  "description": "Multi-terminal AI agent dashboard",
+  "description": "Multi-terminal AI agent cockpit for vibe coders",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
