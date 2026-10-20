@@ -27,7 +27,16 @@ const bridge = !isTauri ? {
   revealInFinder: async () => {},
   spawn: async ({ id, cmd, cwd }) => {
     setTimeout(() => {
-      const banner = `\r\n\x1b[36m◆ VibeDeck Web Demo\x1b[0m\r\n\x1b[90mSession: ${id} | Path: ${cwd || '/'} | Command: ${cmd || 'zsh'} (Browser preview)\x1b[0m\r\n\r\n${cwd || '/'} $ `
+      let banner = ''
+      if (cmd === 'claude') {
+        banner = `\r\n\x1b[38;2;249;115;22m✦ Claude Code CLI v1.0.18 (Thinking)\x1b[0m\r\n\x1b[90mAnthropic Claude 3.7 Sonnet | Workspace: ${cwd || '~/Code/takara-space'}\x1b[0m\r\n\r\n\x1b[32m✔\x1b[0m Architecture indexed. 12 files watched.\r\n\x1b[38;2;249;115;22mclaude >\x1b[0m `
+      } else if (cmd === 'codex') {
+        banner = `\r\n\x1b[38;2;16;185;129m◆ OpenAI Codex Engine\x1b[0m\r\n\x1b[90mMulti-file coding agent connected to ${cwd || '~/Code/takara-space'}\x1b[0m\r\n\r\n\x1b[38;2;16;185;129mcodex >\x1b[0m Generating test suites...\r\n`
+      } else if (cmd === 'kimi') {
+        banner = `\r\n\x1b[38;2;20;184;166m⚡ Kimi Code Agent CLI\x1b[0m\r\n\x1b[90mContext window: 200k tokens | Mode: Deep Research\x1b[0m\r\n\r\n\x1b[38;2;20;184;166mkimi >\x1b[0m `
+      } else {
+        banner = `\r\n\x1b[38;2;34;211;238m⚡ VibeDeck Cockpit Terminal\x1b[0m \x1b[90m(portable-pty xterm.js)\x1b[0m\r\n\x1b[38;2;168;85;247m~/Code/takara-space\x1b[0m \x1b[33m(master)\x1b[0m $ `
+      }
       for (const cb of demoDataListeners) cb(id, banner)
     }, 80)
     return 1000

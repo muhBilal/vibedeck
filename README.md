@@ -16,6 +16,12 @@
 
 ---
 
+<p align="center">
+  <img src="docs/preview.png" alt="VibeDeck Multi-Terminal AI Agent Cockpit & IDE Workspace" width="100%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+</p>
+
+---
+
 ## 🌟 Overview
 
 **VibeDeck** transforms your local AI coding workflow into a high-performance, IDE-grade command center. Instead of juggling dozens of terminal windows, background processes, or browser tabs, VibeDeck provides a unified workspace engineered for parallel agent orchestration.

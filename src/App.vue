@@ -397,6 +397,11 @@ function executePalette(a) {
 onMounted(async () => {
   setTheme(currentTheme.value)
   add('terminal')
+  if (typeof window !== 'undefined' && window.location.search.includes('preview')) {
+    add('claude')
+    add('codex')
+    showFileManager.value = true
+  }
   refreshGit()
   tick()
   timer = setInterval(() => {
