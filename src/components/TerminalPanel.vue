@@ -245,8 +245,9 @@ function restart() {
     tags.value = []
     buf = ''
     props.panel.alive = true
-    window.takara.kill(props.panel.id)
-    window.takara.spawn({
+    const bridge = window.vibedeck || window.takara
+    bridge.kill(props.panel.id)
+    bridge.spawn({
       id: props.panel.id,
       cmd: agent.cmd,
       cols: term.cols,
@@ -274,12 +275,13 @@ onMounted(async () => {
   term.open(el.value)
   fit.fit()
 
-  term.onData((d) => window.takara.write(props.panel.id, d))
+  const bridge = window.vibedeck || window.takara
+  term.onData((d) => bridge.write(props.panel.id, d))
   if (agent.cmd) {
-    window.takara.version(agent.cmd).then((v) => (version.value = v ? `v${v}` : ''))
+    bridge.version(agent.cmd).then((v) => (version.value = v ? `v${v}` : ''))
   }
 
-  window.takara.spawn({
+  bridge.spawn({
     id: props.panel.id,
     cmd: agent.cmd,
     cols: term.cols,
@@ -287,7 +289,7 @@ onMounted(async () => {
     cwd: props.panel.cwd || props.cwd || '~',
   })
 
-  term.onResize(({ cols, rows }) => window.takara.resize(props.panel.id, cols, rows))
+  term.onResize(({ cols, rows }) => bridge.resize(props.panel.id, cols, rows))
 
   ro = new ResizeObserver(() => {
     if (el.value && el.value.offsetWidth > 0 && el.value.offsetHeight > 0) {
@@ -298,14 +300,14 @@ onMounted(async () => {
   })
   ro.observe(el.value)
 
-  unData = await window.takara.onData((id, d) => {
+  unData = await bridge.onData((id, d) => {
     if (id === props.panel.id) {
       term?.write(d)
       scan(d)
     }
   })
 
-  unExit = await window.takara.onExit((id, code) => {
+  unExit = await bridge.onExit((id, code) => {
     if (id !== props.panel.id) return
     props.panel.alive = false
     emit('exit', props.panel, code)
@@ -332,7 +334,8 @@ onBeforeUnmount(() => {
   ro?.disconnect()
   unData?.()
   unExit?.()
-  window.takara.kill(props.panel.id)
+  const bridge = window.vibedeck || window.takara
+  bridge.kill(props.panel.id)
   term?.dispose()
 })
 </script>

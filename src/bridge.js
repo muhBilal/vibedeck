@@ -7,20 +7,20 @@ const demoDataListeners = new Set()
 const demoExitListeners = new Set()
 
 const bridge = !isTauri ? {
-  workspace: async () => '~',
+  workspace: async () => '~/Code/vibedeck',
   gitBranch: async () => 'master',
   version: async () => '1.0.0',
   verifyPath: async () => true,
   readDir: async (path) => ({
-    current_path: path || '~',
-    parent_path: '~',
+    current_path: path || '~/Code/vibedeck',
+    parent_path: '~/Code',
     entries: [
-      { name: 'Documents', path: '~/Documents', is_dir: true, is_symlink: false, size: 0, modified: Date.now() / 1000, ext: '' },
-      { name: 'projects', path: '~/Documents/projects', is_dir: true, is_symlink: false, size: 0, modified: Date.now() / 1000, ext: '' },
-      { name: 'Code', path: '~/Code', is_dir: true, is_symlink: false, size: 0, modified: Date.now() / 1000, ext: '' },
-      { name: 'Desktop', path: '~/Desktop', is_dir: true, is_symlink: false, size: 0, modified: Date.now() / 1000, ext: '' },
-      { name: 'package.json', path: '~/package.json', is_dir: false, is_symlink: false, size: 1024, modified: Date.now() / 1000, ext: 'json' },
-      { name: 'README.md', path: '~/README.md', is_dir: false, is_symlink: false, size: 2048, modified: Date.now() / 1000, ext: 'md' },
+      { name: 'src', path: '~/Code/vibedeck/src', is_dir: true, is_symlink: false, size: 0, modified: Date.now() / 1000, ext: '' },
+      { name: 'src-tauri', path: '~/Code/vibedeck/src-tauri', is_dir: true, is_symlink: false, size: 0, modified: Date.now() / 1000, ext: '' },
+      { name: 'docs', path: '~/Code/vibedeck/docs', is_dir: true, is_symlink: false, size: 0, modified: Date.now() / 1000, ext: '' },
+      { name: 'package.json', path: '~/Code/vibedeck/package.json', is_dir: false, is_symlink: false, size: 1024, modified: Date.now() / 1000, ext: 'json' },
+      { name: 'README.md', path: '~/Code/vibedeck/README.md', is_dir: false, is_symlink: false, size: 2048, modified: Date.now() / 1000, ext: 'md' },
+      { name: 'vite.config.js', path: '~/Code/vibedeck/vite.config.js', is_dir: false, is_symlink: false, size: 512, modified: Date.now() / 1000, ext: 'js' },
     ],
   }),
   readFilePreview: async () => 'Mock preview content for web demo',
@@ -29,13 +29,13 @@ const bridge = !isTauri ? {
     setTimeout(() => {
       let banner = ''
       if (cmd === 'claude') {
-        banner = `\r\n\x1b[38;2;249;115;22m✦ Claude Code CLI v1.0.18 (Thinking)\x1b[0m\r\n\x1b[90mAnthropic Claude 3.7 Sonnet | Workspace: ${cwd || '~/Code/takara-space'}\x1b[0m\r\n\r\n\x1b[32m✔\x1b[0m Architecture indexed. 12 files watched.\r\n\x1b[38;2;249;115;22mclaude >\x1b[0m `
+        banner = `\r\n\x1b[38;2;249;115;22m✦ Claude Code CLI v1.0.18 (Thinking)\x1b[0m\r\n\x1b[90mAnthropic Claude 3.7 Sonnet | Workspace: ${cwd || '~/Code/vibedeck'}\x1b[0m\r\n\r\n\x1b[32m✔\x1b[0m Architecture indexed. 12 files watched.\r\n\x1b[38;2;249;115;22mclaude >\x1b[0m `
       } else if (cmd === 'codex') {
-        banner = `\r\n\x1b[38;2;16;185;129m◆ OpenAI Codex Engine\x1b[0m\r\n\x1b[90mMulti-file coding agent connected to ${cwd || '~/Code/takara-space'}\x1b[0m\r\n\r\n\x1b[38;2;16;185;129mcodex >\x1b[0m Generating test suites...\r\n`
+        banner = `\r\n\x1b[38;2;16;185;129m◆ OpenAI Codex Engine\x1b[0m\r\n\x1b[90mMulti-file coding agent connected to ${cwd || '~/Code/vibedeck'}\x1b[0m\r\n\r\n\x1b[38;2;16;185;129mcodex >\x1b[0m Generating test suites...\r\n`
       } else if (cmd === 'kimi') {
         banner = `\r\n\x1b[38;2;20;184;166m⚡ Kimi Code Agent CLI\x1b[0m\r\n\x1b[90mContext window: 200k tokens | Mode: Deep Research\x1b[0m\r\n\r\n\x1b[38;2;20;184;166mkimi >\x1b[0m `
       } else {
-        banner = `\r\n\x1b[38;2;34;211;238m⚡ VibeDeck Cockpit Terminal\x1b[0m \x1b[90m(portable-pty xterm.js)\x1b[0m\r\n\x1b[38;2;168;85;247m~/Code/takara-space\x1b[0m \x1b[33m(master)\x1b[0m $ `
+        banner = `\r\n\x1b[38;2;34;211;238m⚡ VibeDeck Cockpit Terminal\x1b[0m \x1b[90m(portable-pty xterm.js)\x1b[0m\r\n\x1b[38;2;168;85;247m~/Code/vibedeck\x1b[0m \x1b[33m(master)\x1b[0m $ `
       }
       for (const cb of demoDataListeners) cb(id, banner)
     }, 80)

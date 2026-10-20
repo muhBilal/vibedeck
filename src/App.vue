@@ -17,11 +17,11 @@ const THEMES = [
   { id: 'matrix', label: 'Matrix', icon: 'terminal', desc: 'Hacker Phosphor Green' },
   { id: 'nord', label: 'Nord', icon: 'cloud', desc: 'Arctic Frost Blue' },
 ]
-const currentTheme = ref(localStorage.getItem('takara-theme') || 'dark')
+const currentTheme = ref(localStorage.getItem('vibedeck-theme') || localStorage.getItem('takara-theme') || 'dark')
 
 function setTheme(t) {
   currentTheme.value = t
-  localStorage.setItem('takara-theme', t)
+  localStorage.setItem('vibedeck-theme', t)
   document.documentElement.setAttribute('data-theme', t)
   logActivity(`Theme changed to ${t.toUpperCase()}`, 'info')
 }
@@ -101,7 +101,8 @@ function openPathEditor() {
 
 async function saveWorkspacePath() {
   const target = customPathInput.value.trim() || '~'
-  const exists = await window.takara.verifyPath(target)
+  const bridge = window.vibedeck || window.takara
+  const exists = await bridge.verifyPath(target)
   if (!exists && target !== '~' && target !== '/') {
     pathError.value = 'Direktori tidak ditemukan di sistem'
     return
@@ -270,10 +271,11 @@ function onExit(panel, code) {
 }
 
 async function refreshGit() {
+  const bridge = window.vibedeck || window.takara
   if (active.value?.cwd) {
-    branch.value = await window.takara.gitBranch(active.value.cwd)
+    branch.value = await bridge.gitBranch(active.value.cwd)
   } else {
-    branch.value = await window.takara.gitBranch()
+    branch.value = await bridge.gitBranch()
   }
 }
 
@@ -398,6 +400,7 @@ onMounted(async () => {
   setTheme(currentTheme.value)
   add('terminal')
   if (typeof window !== 'undefined' && window.location.search.includes('preview')) {
+    if (active.value) active.value.cwd = '~/Code/vibedeck'
     add('claude')
     add('codex')
     showFileManager.value = true

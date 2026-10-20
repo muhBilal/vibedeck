@@ -1,4 +1,4 @@
-# ⚡ VibeDeck (Takara Space)
+# ⚡ VibeDeck
 
 > **Next-Gen Multi-Terminal AI Agent Cockpit & IDE Workspace for Vibe Coders.**  
 > Orchestrate multiple AI agents (Claude Code, OpenAI Codex, Kimi, Google Gemini, Antigravity) side-by-side with low-latency terminal grids, file management, and instant git context.
@@ -40,7 +40,7 @@ Run **Claude Code**, **OpenAI Codex**, **Kimi CLI**, and **Google Gemini** simul
 |   Cargo.toml| $ cargo check --release           | > Reviewing security policy |
 |   main.rs   | [OK] Build successful (1.2s)      |                             |
 +-------------+-----------------------------------+-----------------------------+
-| [Status] 4 Active Agents | Memory: 42MB (Rust Engine) | Workspace: ~/Code/takara |
+| [Status] 4 Active Agents | Memory: 42MB (Rust Engine) | Workspace: ~/Code/vibedeck |
 +-------------------------------------------------------------------------------+
 ```
 
