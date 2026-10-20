@@ -1,6 +1,6 @@
 {
   "name": "vibedeck",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Multi-terminal AI agent cockpit for vibe coders",
   "scripts": {
     "dev": "vite",
