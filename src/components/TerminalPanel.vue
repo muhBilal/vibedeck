@@ -245,7 +245,7 @@ function restart() {
     tags.value = []
     buf = ''
     props.panel.alive = true
-    const bridge = window.vibedeck || window.takara
+    const bridge = window.vibedeck
     bridge.kill(props.panel.id)
     bridge.spawn({
       id: props.panel.id,
@@ -275,7 +275,7 @@ onMounted(async () => {
   term.open(el.value)
   fit.fit()
 
-  const bridge = window.vibedeck || window.takara
+  const bridge = window.vibedeck
   term.onData((d) => bridge.write(props.panel.id, d))
   if (agent.cmd) {
     bridge.version(agent.cmd).then((v) => (version.value = v ? `v${v}` : ''))
@@ -334,7 +334,7 @@ onBeforeUnmount(() => {
   ro?.disconnect()
   unData?.()
   unExit?.()
-  const bridge = window.vibedeck || window.takara
+  const bridge = window.vibedeck
   bridge.kill(props.panel.id)
   term?.dispose()
 })

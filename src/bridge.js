@@ -79,4 +79,3 @@ const bridge = !isTauri ? {
 }
 
 window.vibedeck = bridge
-window.takara = bridge
