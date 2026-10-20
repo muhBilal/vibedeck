@@ -49,6 +49,29 @@ const pathError = ref('')
 const paletteSearch = ref('')
 const editingSessionId = ref(null)
 const editSessionName = ref('')
+const termFontSize = ref(parseInt(localStorage.getItem('vibedeck-term-font') || '13', 10))
+
+function zoomIn() {
+  if (termFontSize.value < 28) {
+    termFontSize.value += 1
+    localStorage.setItem('vibedeck-term-font', termFontSize.value)
+    logActivity(`Zoom in: terminal font ${termFontSize.value}px`, 'info')
+  }
+}
+
+function zoomOut() {
+  if (termFontSize.value > 9) {
+    termFontSize.value -= 1
+    localStorage.setItem('vibedeck-term-font', termFontSize.value)
+    logActivity(`Zoom out: terminal font ${termFontSize.value}px`, 'info')
+  }
+}
+
+function zoomReset() {
+  termFontSize.value = 13
+  localStorage.setItem('vibedeck-term-font', '13')
+  logActivity(`Zoom reset: terminal font 13px`, 'info')
+}
 
 const PRESET_PATHS = [
   '~',
@@ -308,6 +331,24 @@ function handleMenu(m) {
 function handleKeydown(e) {
   const isMeta = e.metaKey || e.ctrlKey
 
+  if (isMeta && (e.key === '=' || e.key === '+' || e.code === 'NumpadAdd' || e.code === 'Equal')) {
+    e.preventDefault()
+    zoomIn()
+    return
+  }
+
+  if (isMeta && (e.key === '-' || e.key === '_' || e.code === 'NumpadSubtract' || e.code === 'Minus')) {
+    e.preventDefault()
+    zoomOut()
+    return
+  }
+
+  if (isMeta && (e.key === '0' || e.code === 'Numpad0' || e.code === 'Digit0')) {
+    e.preventDefault()
+    zoomReset()
+    return
+  }
+
   if (isMeta && e.key.toLowerCase() === 'e') {
     e.preventDefault()
     showFileManager.value = !showFileManager.value
@@ -387,6 +428,9 @@ const PALETTE_ACTIONS = [
   { id: 'view_grid', title: 'Layout: Auto Grid', desc: 'Equal distribution grid layout', icon: 'grid', action: () => { layoutMode.value = 'grid' } },
   { id: 'view_cols', title: 'Layout: Columns Split', desc: 'Vertical split columns', icon: 'columns', action: () => { layoutMode.value = 'columns' } },
   { id: 'view_rows', title: 'Layout: Stacked Rows', desc: 'Horizontal split rows', icon: 'rows', action: () => { layoutMode.value = 'stack' } },
+  { id: 'zoom_in', title: 'Zoom: In Terminal Font', desc: 'Perbesar ukuran font terminal (Ctrl/⌘ +)', icon: 'plus', action: () => zoomIn(), shortcut: '⌘+' },
+  { id: 'zoom_out', title: 'Zoom: Out Terminal Font', desc: 'Perkecil ukuran font terminal (Ctrl/⌘ -)', icon: 'collapse', action: () => zoomOut(), shortcut: '⌘-' },
+  { id: 'zoom_reset', title: 'Zoom: Reset Terminal Font', desc: 'Kembalikan font terminal default 13px (Ctrl/⌘ 0)', icon: 'restart', action: () => zoomReset(), shortcut: '⌘0' },
 ]
 
 const filteredActions = computed(() => {
@@ -545,6 +589,12 @@ onBeforeUnmount(() => {
           <div class="telemetry-pill">
             <span class="telem-label">TERMS</span>
             <span class="telem-val">{{ total }}</span>
+          </div>
+
+          <div class="zoom-pill" title="Ukuran Font Terminal (Ctrl + / Ctrl - / Ctrl 0)">
+            <button class="zoom-btn" title="Zoom Out (Ctrl -)" @click="zoomOut">−</button>
+            <span class="zoom-val" title="Klik untuk Reset Default 13px (Ctrl 0)" @click="zoomReset">{{ termFontSize }}px</span>
+            <button class="zoom-btn" title="Zoom In (Ctrl +)" @click="zoomIn">+</button>
           </div>
 
           <div class="clock-display" :title="dateStr">
@@ -864,6 +914,7 @@ onBeforeUnmount(() => {
           :is-maximized="maximizedPanelId === p.id"
           :theme="currentTheme"
           :cwd="x.cwd || '~'"
+          :font-size="termFontSize"
           :class="{
             'over-before': overId === p.id && dropPos === 'before',
             'over-after': overId === p.id && dropPos === 'after',
@@ -874,6 +925,9 @@ onBeforeUnmount(() => {
             height: p.height ? `${p.height}px` : undefined,
           }"
           @toggle-maximize="toggleMaximize(p.id)"
+          @zoom-in="zoomIn"
+          @zoom-out="zoomOut"
+          @zoom-reset="zoomReset"
           @dragover.prevent="onPanelDragOver(p.id, $event)"
           @dragleave="overId = null"
           @drop.prevent="onPanelDrop(p.id)"
@@ -985,6 +1039,8 @@ onBeforeUnmount(() => {
           <div class="sc-row"><kbd>Double Click Title</kbd><span>Ganti Nama Window Terminal</span></div>
           <div class="sc-row"><kbd>Resize Handle</kbd><span>Tarik Handle Sudut / Sisi untuk Ubah Ukuran</span></div>
           <div class="sc-row"><kbd>Grip Drag</kbd><span>Tukar Posisi Terminal Panel</span></div>
+          <div class="sc-row"><kbd>Ctrl / ⌘ + (+ / -)</kbd><span>Zoom In / Out Ukuran Font Terminal</span></div>
+          <div class="sc-row"><kbd>Ctrl / ⌘ + 0</kbd><span>Reset Ukuran Font Terminal (13px)</span></div>
           <div class="sc-row"><kbd>Esc</kbd><span>Tutup Modal / Pulihkan Layar Penuh</span></div>
         </div>
       </div>

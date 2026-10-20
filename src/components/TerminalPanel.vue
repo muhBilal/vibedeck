@@ -17,8 +17,12 @@ const props = defineProps({
     type: String,
     default: '~',
   },
+  fontSize: {
+    type: Number,
+    default: 13,
+  },
 })
-const emit = defineEmits(['close', 'exit', 'dragstart', 'dragend', 'toggle-maximize', 'rename', 'resize'])
+const emit = defineEmits(['close', 'exit', 'dragstart', 'dragend', 'toggle-maximize', 'rename', 'resize', 'zoom-in', 'zoom-out', 'zoom-reset'])
 
 const el = ref(null)
 const tags = ref([])
@@ -260,14 +264,32 @@ function restart() {
 onMounted(async () => {
   const chosenTheme = XTERM_THEMES[props.theme] || XTERM_THEMES.dark
   term = new Terminal({
-    fontFamily: "'JetBrains Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace",
-    fontSize: 13,
+    fontFamily: "'JetBrainsMono Nerd Font', 'JetBrainsMono NFM', 'CaskaydiaCove Nerd Font', 'FiraCode Nerd Font', 'Symbols Nerd Font', 'JetBrains Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace",
+    fontSize: props.fontSize || 13,
     lineHeight: 1.28,
     cursorBlink: true,
     cursorStyle: 'bar',
     cursorWidth: 2,
     scrollback: 10000,
     theme: chosenTheme,
+  })
+
+  term.attachCustomKeyEventHandler((e) => {
+    if ((e.ctrlKey || e.metaKey) && e.type === 'keydown') {
+      if (e.key === '=' || e.key === '+' || e.code === 'NumpadAdd' || e.code === 'Equal') {
+        emit('zoom-in')
+        return false
+      }
+      if (e.key === '-' || e.key === '_' || e.code === 'NumpadSubtract' || e.code === 'Minus') {
+        emit('zoom-out')
+        return false
+      }
+      if (e.key === '0' || e.code === 'Numpad0' || e.code === 'Digit0') {
+        emit('zoom-reset')
+        return false
+      }
+    }
+    return true
   })
 
   fit = new FitAddon()
@@ -333,6 +355,15 @@ watch(() => props.isMaximized, () => {
 watch(() => props.theme, (newTheme) => {
   if (term && XTERM_THEMES[newTheme]) {
     term.options.theme = XTERM_THEMES[newTheme]
+  }
+})
+
+watch(() => props.fontSize, (newSize) => {
+  if (term && newSize) {
+    term.options.fontSize = newSize
+    nextTick(() => {
+      refit()
+    })
   }
 })
 

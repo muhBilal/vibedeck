@@ -29,8 +29,8 @@
   --blue: #38bdf8;
   --term-bg: #090d16;
 
-  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif, 'Symbols Nerd Font';
+  --font-mono: 'JetBrainsMono Nerd Font', 'JetBrainsMono NFM', 'CaskaydiaCove Nerd Font', 'FiraCode Nerd Font', 'Symbols Nerd Font', 'JetBrains Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace;
 }
 
 /* Clean Modern Light Mode */
@@ -539,6 +539,47 @@ kbd {
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(1.2); }
+}
+
+.zoom-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  padding: 2px 4px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  gap: 2px;
+}
+.zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  color: var(--txt-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  transition: all 0.15s;
+}
+.zoom-btn:hover {
+  background: var(--line-subtle);
+  color: var(--cyan);
+}
+.zoom-val {
+  padding: 0 4px;
+  color: var(--txt);
+  font-weight: 600;
+  cursor: pointer;
+}
+.zoom-val:hover {
+  color: var(--cyan);
 }
 
 .clock-display {
